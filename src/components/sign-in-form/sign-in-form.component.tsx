@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import FormInput from "../form-input/form-input.component";
 import Button, { BUTTON_TYPES_CLASSES } from "../button/button.component";
 import { SignInContainer, ButtonsContainer } from './sign-in-form.style';
@@ -19,7 +19,7 @@ const SignInForm = () => {
         setFormFields(defaultFormFields);
     }
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!password || !email) {
@@ -31,20 +31,11 @@ const SignInForm = () => {
             dispatch(emailSignInStart(email, password));
             resetFormField();
         } catch (error) {
-            switch (error.code) {
-                case 'auth/wrong-password':
-                    alert('Incorrect password for email');
-                    break;
-                case 'auth/user-not-found':
-                    alert('no user associated with this email');
-                    break
-                default:
-                    console.log('user login encounter an error', error);
-            }
+            console.log('user login encounter an error', error);
         }
     } 
 
-    const handleChange = (event) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setFormFields({ ...formFields, [name]: value });
     }

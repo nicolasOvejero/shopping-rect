@@ -3,13 +3,17 @@ import styled, { css } from 'styled-components';
 const subColor = 'grey';
 const mainColor = 'black';
 
+type FromInputLabelProps = {
+  shrink?: boolean;
+}
+
 const shrinkLabelStyles = css`
   top: -14px;
   font-size: 12px;
   color: ${mainColor};
 `;
 
-export const FormInputLabel = styled.label`
+export const FormInputLabel = styled.label<FromInputLabelProps>`
   color: ${subColor};
   font-size: 16px;
   font-weight: normal;
