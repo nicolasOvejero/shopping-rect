@@ -1,6 +1,9 @@
 import { createSelector } from 'reselect';
+import { RootState } from '../store';
+import { CategoriesState } from './category.reducer';
+import { CategoryMap } from './category.types';
 
-const selectCategoryReducer = (state) => {
+const selectCategoryReducer = (state: RootState): CategoriesState => {
     return state.categories;
 };
 
@@ -18,7 +21,7 @@ export const selectCategoriesMap = createSelector(
             const { title, items } = category;
             accu[title.toLowerCase()] = items;
             return accu;
-        }, {})
+        }, {} as CategoryMap);
     }
 );
 

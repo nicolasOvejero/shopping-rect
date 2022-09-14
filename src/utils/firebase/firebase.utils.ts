@@ -8,6 +8,8 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
+    User,
+    NextOrObserver,
 } from 'firebase/auth';
 import { 
     getFirestore,
@@ -19,6 +21,7 @@ import {
     query,
     getDocs
 } from 'firebase/firestore';
+import { Category } from '../../store/category/category.types';
 
 const firebaseConfig = {
     apiKey: "AIzaSyA9gCQrJW5dp01wgJemgBSp2Ym_aDV2PzU",
@@ -43,8 +46,8 @@ export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googlePro
 export const db = getFirestore();
 
 export const createUserDocumentFromAuth = async (
-    userAuth, 
-    additionnalInformation = {}
+    userAuth: User, 
+    additionnalInformation = {} as AdditionalInformation
 ) => {
     if (!userAuth) {
         return;
@@ -65,14 +68,14 @@ export const createUserDocumentFromAuth = async (
                 ...additionnalInformation,
             });
         } catch (error) {
-            console.log('Error', error.message);
+            console.log('Error', error);
         }
     }
 
     return userSnapshot;
 }
 
-export const createAuthUserWithEmailAndPassword = async (email, password) => {
+export const createAuthUserWithEmailAndPassword = async (email: string, password: string) => {
     if (!email || ! password) {
         return;
     }
@@ -80,7 +83,7 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
     return await createUserWithEmailAndPassword(auth, email, password);
 }
 
-export const signInAuthWithEmailAndPassword = async (email, password) => {
+export const signInAuthWithEmailAndPassword = async (email: string, password: string) => {
     if (!email || ! password) {
         return;
     }
@@ -90,9 +93,9 @@ export const signInAuthWithEmailAndPassword = async (email, password) => {
 
 export const signOutUser =  async () => await signOut(auth);
 
-export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);
+export const onAuthStateChangedListener = (callback: NextOrObserver<User>) => onAuthStateChanged(auth, callback);
 
-export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+export const addCollectionAndDocuments = async <T extends ObjectToAdd>(collectionKey: string, objectsToAdd: T[]) => {
     const collectionRef = collection(db, collectionKey);
     const batch = writeBatch(db);
 
@@ -104,17 +107,17 @@ export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => 
     await batch.commit();
 }
 
-export const getCategoriesAndDocuments = async () => {
+export const getCategoriesAndDocuments = async (): Promise<Category[]> => {
     const collectionRef = collection(db, 'categories');
     const q = query(collectionRef);
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((docSnap) => {
-        return docSnap.data();
-    });
+    return querySnapshot.docs.map((docSnap) => 
+        docSnap.data() as Category
+    );
 }
 
-export const getCurrentUser = () => {
+export const getCurrentUser = (): Promise<User | null>  => {
     return new Promise((resolve, reject) => {
         const unsubscribe = onAuthStateChanged(
             auth,
@@ -126,3 +129,18 @@ export const getCurrentUser = () => {
         );
     });
 }
+
+export type AdditionalInformation = {
+    displayName?: string;
+};
+  
+export type UserData = {
+    createdAt: Date;
+    displayName: string;
+    email: string;
+};
+  
+export type ObjectToAdd = {
+    title: string;
+};
+  
